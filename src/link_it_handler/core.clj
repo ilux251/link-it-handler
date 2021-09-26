@@ -17,8 +17,14 @@
 (defmulti create-verweis verweis-type)
 
 (defmethod create-verweis :isa-target
-  [{:keys [match node]}]
-  (assoc node :content [(dxml/->Element :verweis {:refid (first match)} (:content node))]))
+  [{:keys [match node text]}]
+  (let [before (subs text 0 (str/index-of text (first match)))
+        after (subs text (+ (str/index-of text (first match)) (count (first match))) (count text))]
+    (assoc node :content (filter not-empty [before (dxml/element :verweis {:refid (first match)} (first match)) after]))))
+
+(defmethod create-verweis :no-target-found
+  [{:keys [node]}]
+  node)
 
 (defn is-target?
   [regex content]
@@ -30,15 +36,23 @@
                   (apply str))]
     {:target-fn target-fn
      :node node
+     :text text
      :match (is-target? regex text)}))
 
-(let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 200 Verweis.")]
+(let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 20 Verweis.")]
  (->> (map #(mark-target node (:regex %) (:target-fn %)) config)
       (filter #(-> %
                    :match
                    nil?
                    not))
       first))
+
+(let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 20 Verweis.")]
+  (-> (map #(mark-target node (:regex %) (:target-fn %)) config)
+      vec
+      (conj {:target-fn :no-target-found
+             :node node
+             :match (:content node)})))
 
 (defn -main
   "I don't do a whole lot ... yet."

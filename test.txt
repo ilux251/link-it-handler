@@ -1,0 +1,15 @@
+[:tag :section :attrs {} :content (
+	"IDW PS 300"
+	[:tag :absatz :attrs {} :content ("ISA [DE] 200")]
+	[:tag :absatz :attrs {} :content ("IDW PS 700")]
+	"ISA [DE] 500"
+)]
+
+- isa-target
+-> [:tag :absatz :attrs {} :content ("ISA [DE] 200")]
+-> [:tag :absatz :attrs {} :content ([:tag :verweis :attrs {} :content ("ISA [DE] 200")])]
+- ps-target
+-> [:tag :absatz :attrs {} :content ("IDW PS 230")]
+-> [:tag :absatz :attrs {} :content ([:tag :verweis :attrs {} :content ("IDW PS 230")])]
+- no-target 
+-> default should pass node

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><book>
+  <title>Test</title>
+  <section>
+    <title>Section 1</title>
+    <absatz>Hier ISA [DE] <b>720</b> steht ein Link das verlinkt werden soll. IDW PS 350 test</absatz>
+  </section>
+</book>
