@@ -39,6 +39,14 @@
      :text text
      :match (is-target? regex text)}))
 
+(defn get-first-match
+  [matches]
+  (first 
+   (filter #(-> %
+               :match
+               nil?
+               not) matches)))
+
 (let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 20 Verweis.")]
  (->> (map #(mark-target node (:regex %) (:target-fn %)) config)
       (filter #(-> %
@@ -47,12 +55,30 @@
                    not))
       first))
 
-(let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 20 Verweis.")]
+(let [node (dxml/element :absatz {} "Das ist ein ISA [DE] 200 Verweis.")]
   (-> (map #(mark-target node (:regex %) (:target-fn %)) config)
       vec
       (conj {:target-fn :no-target-found
              :node node
-             :match (:content node)})))
+             :match (:content node)})
+      (get-first-match)
+      (create-verweis)))
+
+(defn handle-node
+  [node]
+  (cond
+    (.isInstance Element node) (map handle-node (:content node))
+    (string? node) "Handle verweis"))
+
+(->>
+ (dxml/->Element
+ :absatz
+ {}
+ '("Das ist ein "
+  (dxml/->Element :span {} "ISA ")
+  (dxml/->Element :b {} "[DE]")
+  " 200 Verweis."))
+ handle-node)
 
 (defn -main
   "I don't do a whole lot ... yet."
